@@ -1,0 +1,11 @@
+QUERY PLAN                                                                                                                      |
+--------------------------------------------------------------------------------------------------------------------------------+
+Subquery Scan on ranked  (cost=90527.34..108127.50 rows=586672 width=53) (actual time=322.050..385.702 rows=61 loops=1)         |
+  ->  WindowAgg  (cost=90527.34..102260.78 rows=586672 width=138) (actual time=322.049..385.696 rows=61 loops=1)                |
+        Run Condition: (row_number() OVER (?) <= 5)                                                                             |
+        ->  Sort  (cost=90527.34..91994.02 rows=586672 width=53) (actual time=322.035..359.837 rows=586672 loops=1)             |
+              Sort Key: tracks.decade, tracks.popularity DESC                                                                   |
+              Sort Method: external merge  Disk: 37056kB                                                                        |
+              ->  Seq Scan on tracks  (cost=0.00..14262.72 rows=586672 width=53) (actual time=0.486..79.776 rows=586672 loops=1)|
+Planning Time: 0.694 ms                                                                                                         |
+Execution Time: 394.619 ms                                                                                                      |

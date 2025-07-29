@@ -1,0 +1,190 @@
+{
+  explainVersion: '2',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: 'FA44DA7E',
+          planCacheShapeHash: 'FA44DA7E',
+          planCacheKey: 'B3A1CCBE',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            queryPlan: {
+              stage: 'GROUP',
+              planNodeId: 3,
+              inputStage: {
+                stage: 'COLLSCAN',
+                planNodeId: 1,
+                filter: {},
+                direction: 'forward'
+              }
+            },
+            slotBasedPlan: {
+              slots: '$$RESULT=s9 env: {  }',
+              stages: '[3] project [s9 = newObj("_id", s7, "track_count", s8)] \n' +
+                '[3] project [s7 = newObj("decade", s1, "tempo_class", s2), s8 = (convert ( s6, int32) ?: s6)] \n' +
+                '[3] group [s1, s2] [s6 = count()] spillSlots[s5] mergingExprs[sum(s5)] \n' +
+                '[1] scan s3 s4 none none none none none none lowPriority [s1 = decade, s2 = tempo_class] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false '
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 37,
+          executionTimeMillis: 342,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            stage: 'project',
+            planNodeId: 3,
+            nReturned: 37,
+            executionTimeMillisEstimate: 331,
+            opens: 1,
+            closes: 1,
+            saveState: 13,
+            restoreState: 13,
+            isEOF: 1,
+            projections: {
+              '9': 'newObj("_id", s7, "track_count", s8) '
+            },
+            inputStage: {
+              stage: 'project',
+              planNodeId: 3,
+              nReturned: 37,
+              executionTimeMillisEstimate: 331,
+              opens: 1,
+              closes: 1,
+              saveState: 13,
+              restoreState: 13,
+              isEOF: 1,
+              projections: {
+                '7': 'newObj("decade", s1, "tempo_class", s2) ',
+                '8': '(convert ( s6, int32) ?: s6) '
+              },
+              inputStage: {
+                stage: 'group',
+                planNodeId: 3,
+                nReturned: 37,
+                executionTimeMillisEstimate: 331,
+                opens: 1,
+                closes: 1,
+                saveState: 13,
+                restoreState: 13,
+                isEOF: 1,
+                groupBySlots: [
+                  1,
+                  2
+                ],
+                expressions: {
+                  '6': 'count() ',
+                  initExprs: {
+                    '6': null
+                  }
+                },
+                mergingExprs: {
+                  '5': 'sum(s5) '
+                },
+                usedDisk: false,
+                spills: 0,
+                spilledBytes: 0,
+                spilledRecords: 0,
+                spilledDataStorageSize: 0,
+                inputStage: {
+                  stage: 'scan',
+                  planNodeId: 1,
+                  nReturned: 586672,
+                  executionTimeMillisEstimate: 237,
+                  opens: 1,
+                  closes: 1,
+                  saveState: 13,
+                  restoreState: 13,
+                  isEOF: 1,
+                  numReads: 586672,
+                  recordSlot: 3,
+                  recordIdSlot: 4,
+                  scanFieldNames: [
+                    'decade',
+                    'tempo_class'
+                  ],
+                  scanFieldSlots: [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      nReturned: 37,
+      executionTimeMillisEstimate: 342
+    },
+    {
+      '$sort': {
+        sortKey: {
+          '_id.decade': 1,
+          '_id.tempo_class': 1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 21090,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 37,
+      executionTimeMillisEstimate: 342
+    }
+  ],
+  queryShapeHash: '1A7469AF7AFC466B98C8B861DADBDB1DC8FBC0BB5AA9073CE9A51F0DFA9783F2',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$group': {
+          _id: {
+            decade: '$decade',
+            tempo_class: '$tempo_class'
+          },
+          track_count: {
+            '$sum': 1
+          }
+        }
+      },
+      {
+        '$sort': {
+          '_id.decade': 1,
+          '_id.tempo_class': 1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}

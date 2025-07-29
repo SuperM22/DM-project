@@ -1,0 +1,30 @@
+QUERY PLAN                                                                                                                                                                         |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+Sort  (cost=122379.50..122625.35 rows=98342 width=53) (actual time=847.546..857.480 rows=98504 loops=1)                                                                            |
+  Sort Key: (avg(af.valence)) DESC                                                                                                                                                 |
+  Sort Method: external merge  Disk: 6424kB                                                                                                                                        |
+  ->  Finalize GroupAggregate  (cost=81069.96..110860.73 rows=98342 width=53) (actual time=710.715..823.631 rows=98504 loops=1)                                                    |
+        Group Key: a.id                                                                                                                                                            |
+        ->  Gather Merge  (cost=81069.96..107910.47 rows=196684 width=101) (actual time=710.705..787.586 rows=172746 loops=1)                                                      |
+              Workers Planned: 2                                                                                                                                                   |
+              Workers Launched: 2                                                                                                                                                  |
+              ->  Partial GroupAggregate  (cost=80069.93..84208.23 rows=98342 width=101) (actual time=700.609..760.447 rows=57582 loops=3)                                         |
+                    Group Key: a.id                                                                                                                                                |
+                    ->  Sort  (cost=80069.93..80858.65 rows=315488 width=53) (actual time=700.230..724.114 rows=252390 loops=3)                                                    |
+                          Sort Key: a.id                                                                                                                                           |
+                          Sort Method: external merge  Disk: 15712kB                                                                                                               |
+                          Worker 0:  Sort Method: external merge  Disk: 16312kB                                                                                                    |
+                          Worker 1:  Sort Method: external merge  Disk: 17336kB                                                                                                    |
+                          ->  Hash Join  (cost=21126.75..40470.98 rows=315488 width=53) (actual time=517.315..624.683 rows=252390 loops=3)                                         |
+                                Hash Cond: (ta.artist_id = a.id)                                                                                                                   |
+                                ->  Parallel Hash Join  (cost=18077.05..36593.10 rows=315488 width=39) (actual time=482.799..533.879 rows=252390 loops=3)                          |
+                                      Hash Cond: (ta.track_id = af.track_id)                                                                                                       |
+                                      ->  Parallel Seq Scan on track_artists ta  (cost=0.00..10231.88 rows=315488 width=46) (actual time=0.544..138.962 rows=252390 loops=3)       |
+                                      ->  Parallel Hash  (cost=13111.47..13111.47 rows=244447 width=39) (actual time=257.683..257.684 rows=195557 loops=3)                         |
+                                            Buckets: 131072  Batches: 8  Memory Usage: 6240kB                                                                                      |
+                                            ->  Parallel Seq Scan on audio_features af  (cost=0.00..13111.47 rows=244447 width=39) (actual time=0.455..205.676 rows=195557 loops=3)|
+                                ->  Hash  (cost=1820.42..1820.42 rows=98342 width=37) (actual time=34.308..34.308 rows=98504 loops=3)                                              |
+                                      Buckets: 131072  Batches: 1  Memory Usage: 7665kB                                                                                            |
+                                      ->  Seq Scan on artists a  (cost=0.00..1820.42 rows=98342 width=37) (actual time=0.055..16.867 rows=98504 loops=3)                           |
+Planning Time: 6.253 ms                                                                                                                                                            |
+Execution Time: 863.299 ms                                                                                                                                                         |

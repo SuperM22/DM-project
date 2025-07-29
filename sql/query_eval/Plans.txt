@@ -1,0 +1,148 @@
+Q1
+
+SQL:
+
+EXPLAIN ANALYZE
+SELECT decade, tempo_class, COUNT(*) AS track_count
+FROM tracks
+GROUP BY decade, tempo_class
+ORDER BY decade, tempo_class;
+
+MONGODB:
+
+db.tracks.aggregate([
+  {
+    $group: {
+      _id: { decade: "$decade", tempo_class: "$tempo_class" },
+      track_count: { $sum: 1 }
+    }
+  },
+  { $sort: { "_id.decade": 1, "_id.tempo_class": 1 } }
+]).explain("executionStats")
+
+
+Q2
+
+SQL:
+
+EXPLAIN ANALYZE
+SELECT
+  a.id AS artist_id,
+  a.name,
+  AVG(af.valence) AS avg_valence,
+  AVG(af.energy) AS avg_energy
+FROM artists a
+JOIN track_artists ta ON a.id = ta.artist_id
+JOIN audio_features af ON ta.track_id = af.track_id
+GROUP BY a.id, a.name
+ORDER BY avg_valence DESC
+
+MONGODB:
+
+db.tracks.aggregate([
+  { $unwind: "$id_artists" },
+  { $group: {
+      _id: "$id_artists",
+      avg_valence: { $avg: "$audio_features.valence" },
+      avg_energy: { $avg: "$audio_features.energy" }
+  }},
+  { $sort: { avg_valence: -1 } }
+]).explain("executionStats")
+
+
+Q3
+
+SQL:
+
+EXPLAIN ANALYZE
+SELECT id, name, popularity, decade
+FROM (
+  SELECT *,
+         ROW_NUMBER() OVER (PARTITION BY decade ORDER BY popularity DESC) AS rk
+  FROM tracks
+) ranked
+WHERE rk <= 5;
+
+MONGODB:
+
+db.tracks.aggregate([
+  { $sort: { decade: 1, popularity: -1 } },
+  { $group: {
+      _id: "$decade",
+      top_tracks: { $push: {
+        id: "$_id",
+        name: "$name",
+        popularity: "$popularity"
+      }}
+  }},
+  { $project: {
+      decade: "$_id",
+      top_tracks: { $slice: ["$top_tracks", 5] }
+  }}
+]).explain("executionStats")
+
+
+Q4
+
+SQL:
+
+EXPLAIN ANALYZE
+SELECT decade, mood_cluster, COUNT(*) AS mood_count
+FROM tracks
+GROUP BY decade, mood_cluster
+ORDER BY decade, mood_cluster;
+
+
+MONGODB:
+
+db.tracks.aggregate([
+  { $group: {
+      _id: { decade: "$decade", mood_cluster: "$mood_cluster" },
+      mood_count: { $sum: 1 }
+  }},
+  { $sort: { "_id.decade": 1, "_id.mood_cluster": 1 } }
+]).explain("executionStats")
+
+
+Q5
+
+SQL:
+
+EXPLAIN ANALYZE
+SELECT artist_id, COUNT(DISTINCT track_id) AS collab_count
+FROM track_artists
+GROUP BY artist_id
+ORDER BY collab_count DESC
+LIMIT 20;
+
+MONGODB:
+
+db.tracks.aggregate([
+  { $unwind: "$id_artists" },
+  { $group: {
+      _id: "$id_artists",
+      collab_count: { $sum: 1 }
+  }},
+  { $sort: { collab_count: -1 } }
+]).explain("executionStats")
+
+
+
+MONGODB INDEX Creation:
+// Q1
+db.tracks.createIndex({ decade: 1, tempo_class: 1 })
+
+// Q2 (optional for optimization, limited gain for aggregation alone)
+db.tracks.createIndex({ id_artists: 1 })
+
+// Q3
+db.tracks.createIndex({ decade: 1, popularity: -1 })
+
+// Q4
+db.tracks.createIndex({ decade: 1, mood_cluster: 1 })
+
+
+
+
+
+

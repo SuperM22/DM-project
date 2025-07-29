@@ -1,0 +1,20 @@
+|QUERY PLAN                                                                                                                                     |
+|-----------------------------------------------------------------------------------------------------------------------------------------------|
+|Finalize GroupAggregate  (cost=13675.13..13684.43 rows=36 width=17) (actual time=229.836..231.510 rows=37 loops=1)                             |
+|  Group Key: decade, tempo_class                                                                                                               |
+|  ->  Gather Merge  (cost=13675.13..13683.53 rows=72 width=17) (actual time=229.824..231.470 rows=109 loops=1)                                 |
+|        Workers Planned: 2                                                                                                                     |
+|        Workers Launched: 2                                                                                                                    |
+|        ->  Sort  (cost=12675.11..12675.20 rows=36 width=17) (actual time=224.392..224.394 rows=36 loops=3)                                    |
+|              Sort Key: decade, tempo_class                                                                                                    |
+|              Sort Method: quicksort  Memory: 27kB                                                                                             |
+|              Worker 0:  Sort Method: quicksort  Memory: 27kB                                                                                  |
+|              Worker 1:  Sort Method: quicksort  Memory: 27kB                                                                                  |
+|              ->  Partial HashAggregate  (cost=12673.82..12674.18 rows=36 width=17) (actual time=224.335..224.342 rows=36 loops=3)             |
+|                    Group Key: decade, tempo_class                                                                                             |
+|                    Batches: 1  Memory Usage: 24kB                                                                                             |
+|                    Worker 0:  Batches: 1  Memory Usage: 24kB                                                                                  |
+|                    Worker 1:  Batches: 1  Memory Usage: 24kB                                                                                  |
+|                    ->  Parallel Seq Scan on tracks  (cost=0.00..10840.47 rows=244447 width=9) (actual time=0.398..140.622 rows=195557 loops=3)|
+|Planning Time: 0.587 ms                                                                                                                        |
+|Execution Time: 231.708 ms                                                                                                                     |

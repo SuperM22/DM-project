@@ -1,0 +1,285 @@
+{
+  explainVersion: '2',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '33B06002',
+          planCacheShapeHash: '33B06002',
+          planCacheKey: '1089408A',
+          optimizationTimeMillis: 19,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            queryPlan: {
+              stage: 'GROUP',
+              planNodeId: 4,
+              inputStage: {
+                stage: 'SORT',
+                planNodeId: 3,
+                sortPattern: {
+                  decade: 1,
+                  popularity: -1
+                },
+                memLimit: 104857600,
+                type: 'simple',
+                inputStage: {
+                  stage: 'PROJECTION_SIMPLE',
+                  planNodeId: 2,
+                  transformBy: {
+                    _id: true,
+                    decade: true,
+                    name: true,
+                    popularity: true
+                  },
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    planNodeId: 1,
+                    filter: {},
+                    direction: 'forward'
+                  }
+                }
+              }
+            },
+            slotBasedPlan: {
+              slots: '$$RESULT=s14 env: {  }',
+              stages: '[4] project [s14 = newObj("_id", s11, "top_tracks", s13)] \n' +
+                '[4] project [s13 = getElement(s12, 0)] \n' +
+                '[4] group [s11] [s12 = addToArrayCapped(newObj("id", s1, "name", s3, "popularity", s4), 104857600)] spillSlots[s10] mergingExprs[aggConcatArraysCapped(s10, 104857600)] \n' +
+                '[4] project [s11 = (s2 ?: null)] \n' +
+                '[3] sort [s8, s9] [asc, desc] [s1, s2, s3, s4] \n' +
+                '[3] project [s7 = ((!((isArray(s2) ?: false)) || !((isArray(s4) ?: false))) || fail(2, "cannot sort with keys that are parallel arrays")), s8 = getSortKeyAsc(s2), s9 = getSortKeyDesc(s4)] \n' +
+                '[1] scan s5 s6 none none none none none none lowPriority [s1 = _id, s2 = decade, s3 = name, s4 = popularity] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false '
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 13,
+          executionTimeMillis: 1503,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            stage: 'project',
+            planNodeId: 4,
+            nReturned: 13,
+            executionTimeMillisEstimate: 1132,
+            opens: 1,
+            closes: 1,
+            saveState: 50,
+            restoreState: 50,
+            isEOF: 1,
+            projections: {
+              '14': 'newObj("_id", s11, "top_tracks", s13) '
+            },
+            inputStage: {
+              stage: 'project',
+              planNodeId: 4,
+              nReturned: 13,
+              executionTimeMillisEstimate: 1125,
+              opens: 1,
+              closes: 1,
+              saveState: 50,
+              restoreState: 50,
+              isEOF: 1,
+              projections: {
+                '13': 'getElement(s12, 0) '
+              },
+              inputStage: {
+                stage: 'group',
+                planNodeId: 4,
+                nReturned: 13,
+                executionTimeMillisEstimate: 1125,
+                opens: 1,
+                closes: 1,
+                saveState: 50,
+                restoreState: 50,
+                isEOF: 1,
+                groupBySlots: [
+                  11
+                ],
+                expressions: {
+                  '12': 'addToArrayCapped(newObj("id", s1, "name", s3, "popularity", s4), 104857600) ',
+                  initExprs: {
+                    '12': null
+                  }
+                },
+                mergingExprs: {
+                  '10': 'aggConcatArraysCapped(s10, 104857600) '
+                },
+                usedDisk: true,
+                spills: 2,
+                spilledBytes: 42430985,
+                spilledRecords: 14,
+                spilledDataStorageSize: 13611008,
+                inputStage: {
+                  stage: 'project',
+                  planNodeId: 4,
+                  nReturned: 586672,
+                  executionTimeMillisEstimate: 452,
+                  opens: 1,
+                  closes: 1,
+                  saveState: 50,
+                  restoreState: 50,
+                  isEOF: 1,
+                  projections: {
+                    '11': '(s2 ?: null) '
+                  },
+                  inputStage: {
+                    stage: 'sort',
+                    planNodeId: 3,
+                    nReturned: 586672,
+                    executionTimeMillisEstimate: 452,
+                    opens: 1,
+                    closes: 1,
+                    saveState: 50,
+                    restoreState: 50,
+                    isEOF: 1,
+                    memLimit: 104857600,
+                    totalDataSizeSorted: 0,
+                    usedDisk: false,
+                    spills: 0,
+                    spilledDataStorageSize: 0,
+                    orderBySlots: {
+                      '8': 'asc',
+                      '9': 'desc'
+                    },
+                    outputSlots: [
+                      1,
+                      2,
+                      3,
+                      4
+                    ],
+                    inputStage: {
+                      stage: 'project',
+                      planNodeId: 3,
+                      nReturned: 586672,
+                      executionTimeMillisEstimate: 242,
+                      opens: 1,
+                      closes: 1,
+                      saveState: 50,
+                      restoreState: 50,
+                      isEOF: 1,
+                      projections: {
+                        '7': '((!((isArray(s2) ?: false)) || !((isArray(s4) ?: false))) || fail(2, "cannot sort with keys that are parallel arrays")) ',
+                        '8': 'getSortKeyAsc(s2) ',
+                        '9': 'getSortKeyDesc(s4) '
+                      },
+                      inputStage: {
+                        stage: 'scan',
+                        planNodeId: 1,
+                        nReturned: 586672,
+                        executionTimeMillisEstimate: 194,
+                        opens: 1,
+                        closes: 1,
+                        saveState: 50,
+                        restoreState: 50,
+                        isEOF: 1,
+                        numReads: 586672,
+                        recordSlot: 5,
+                        recordIdSlot: 6,
+                        scanFieldNames: [
+                          '_id',
+                          'decade',
+                          'name',
+                          'popularity'
+                        ],
+                        scanFieldSlots: [
+                          1,
+                          2,
+                          3,
+                          4
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      nReturned: 13,
+      executionTimeMillisEstimate: 1383
+    },
+    {
+      '$project': {
+        _id: true,
+        decade: '$_id',
+        top_tracks: {
+          '$slice': [
+            '$top_tracks',
+            {
+              '$const': 5
+            }
+          ]
+        }
+      },
+      nReturned: 13,
+      executionTimeMillisEstimate: 1499
+    }
+  ],
+  queryShapeHash: 'C4888DF7AB5637F3B9DE200590C6E3180F30BCDC1E9A24648EB8CCD2CECFE87F',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$sort': {
+          decade: 1,
+          popularity: -1
+        }
+      },
+      {
+        '$group': {
+          _id: '$decade',
+          top_tracks: {
+            '$push': {
+              id: '$_id',
+              name: '$name',
+              popularity: '$popularity'
+            }
+          }
+        }
+      },
+      {
+        '$project': {
+          decade: '$_id',
+          top_tracks: {
+            '$slice': [
+              '$top_tracks',
+              5
+            ]
+          }
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
