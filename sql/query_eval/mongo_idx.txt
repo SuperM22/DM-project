@@ -1,0 +1,1044 @@
+Q1
+
+{
+  explainVersion: '2',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: 'FA44DA7E',
+          planCacheShapeHash: 'FA44DA7E',
+          planCacheKey: 'B3A1CCBE',
+          optimizationTimeMillis: 2,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            queryPlan: {
+              stage: 'GROUP',
+              planNodeId: 3,
+              inputStage: {
+                stage: 'COLLSCAN',
+                planNodeId: 1,
+                filter: {},
+                direction: 'forward'
+              }
+            },
+            slotBasedPlan: {
+              slots: '$$RESULT=s9 env: {  }',
+              stages: '[3] project [s9 = newObj("_id", s7, "track_count", s8)] \n' +
+                '[3] project [s7 = newObj("decade", s1, "tempo_class", s2), s8 = (convert ( s6, int32) ?: s6)] \n' +
+                '[3] group [s1, s2] [s6 = count()] spillSlots[s5] mergingExprs[sum(s5)] \n' +
+                '[1] scan s3 s4 none none none none none none lowPriority [s1 = decade, s2 = tempo_class] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false '
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 37,
+          executionTimeMillis: 317,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            stage: 'project',
+            planNodeId: 3,
+            nReturned: 37,
+            executionTimeMillisEstimate: 307,
+            opens: 1,
+            closes: 1,
+            saveState: 11,
+            restoreState: 11,
+            isEOF: 1,
+            projections: {
+              '9': 'newObj("_id", s7, "track_count", s8) '
+            },
+            inputStage: {
+              stage: 'project',
+              planNodeId: 3,
+              nReturned: 37,
+              executionTimeMillisEstimate: 307,
+              opens: 1,
+              closes: 1,
+              saveState: 11,
+              restoreState: 11,
+              isEOF: 1,
+              projections: {
+                '7': 'newObj("decade", s1, "tempo_class", s2) ',
+                '8': '(convert ( s6, int32) ?: s6) '
+              },
+              inputStage: {
+                stage: 'group',
+                planNodeId: 3,
+                nReturned: 37,
+                executionTimeMillisEstimate: 307,
+                opens: 1,
+                closes: 1,
+                saveState: 11,
+                restoreState: 11,
+                isEOF: 1,
+                groupBySlots: [
+                  1,
+                  2
+                ],
+                expressions: {
+                  '6': 'count() ',
+                  initExprs: {
+                    '6': null
+                  }
+                },
+                mergingExprs: {
+                  '5': 'sum(s5) '
+                },
+                usedDisk: false,
+                spills: 0,
+                spilledBytes: 0,
+                spilledRecords: 0,
+                spilledDataStorageSize: 0,
+                inputStage: {
+                  stage: 'scan',
+                  planNodeId: 1,
+                  nReturned: 586672,
+                  executionTimeMillisEstimate: 282,
+                  opens: 1,
+                  closes: 1,
+                  saveState: 11,
+                  restoreState: 11,
+                  isEOF: 1,
+                  numReads: 586672,
+                  recordSlot: 3,
+                  recordIdSlot: 4,
+                  scanFieldNames: [
+                    'decade',
+                    'tempo_class'
+                  ],
+                  scanFieldSlots: [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      nReturned: 37,
+      executionTimeMillisEstimate: 313
+    },
+    {
+      '$sort': {
+        sortKey: {
+          '_id.decade': 1,
+          '_id.tempo_class': 1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 21090,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 37,
+      executionTimeMillisEstimate: 313
+    }
+  ],
+  queryShapeHash: '1A7469AF7AFC466B98C8B861DADBDB1DC8FBC0BB5AA9073CE9A51F0DFA9783F2',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$group': {
+          _id: {
+            decade: '$decade',
+            tempo_class: '$tempo_class'
+          },
+          track_count: {
+            '$sum': 1
+          }
+        }
+      },
+      {
+        '$sort': {
+          '_id.decade': 1,
+          '_id.tempo_class': 1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
+
+
+Q2
+
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: 'F2C2010F',
+          planCacheShapeHash: 'F2C2010F',
+          planCacheKey: 'B66C8223',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_DEFAULT',
+            transformBy: {
+              'audio_features.energy': 1,
+              'audio_features.valence': 1,
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 586672,
+          executionTimeMillis: 643,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_DEFAULT',
+            nReturned: 586672,
+            executionTimeMillisEstimate: 89,
+            works: 586673,
+            advanced: 586672,
+            needTime: 0,
+            needYield: 0,
+            saveState: 56,
+            restoreState: 56,
+            isEOF: 1,
+            transformBy: {
+              'audio_features.energy': 1,
+              'audio_features.valence': 1,
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 586672,
+              executionTimeMillisEstimate: 2,
+              works: 586673,
+              advanced: 586672,
+              needTime: 0,
+              needYield: 0,
+              saveState: 56,
+              restoreState: 56,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 586672
+            }
+          }
+        }
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 480
+    },
+    {
+      '$unwind': {
+        path: '$id_artists'
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 480
+    },
+    {
+      '$group': {
+        _id: '$id_artists',
+        avg_valence: {
+          '$avg': '$audio_features.valence'
+        },
+        avg_energy: {
+          '$avg': '$audio_features.energy'
+        }
+      },
+      maxAccumulatorMemoryUsageBytes: {
+        avg_valence: 11966448,
+        avg_energy: 11966448
+      },
+      totalOutputDataSizeBytes: 40023644,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      numBytesSpilledEstimate: 0,
+      spilledRecords: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 612
+    },
+    {
+      '$sort': {
+        sortKey: {
+          avg_valence: -1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 40944140,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 612
+    }
+  ],
+  queryShapeHash: '074971A10A240C0B514D33A0D76676592A5C4569BF1DA8A76C0A8492E8F78B43',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$unwind': '$id_artists'
+      },
+      {
+        '$group': {
+          _id: '$id_artists',
+          avg_valence: {
+            '$avg': '$audio_features.valence'
+          },
+          avg_energy: {
+            '$avg': '$audio_features.energy'
+          }
+        }
+      },
+      {
+        '$sort': {
+          avg_valence: -1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
+
+
+Q3
+
+{
+  explainVersion: '2',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '33B06002',
+          planCacheShapeHash: '33B06002',
+          planCacheKey: '1089408A',
+          optimizationTimeMillis: 3,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            queryPlan: {
+              stage: 'GROUP',
+              planNodeId: 4,
+              inputStage: {
+                stage: 'FETCH',
+                planNodeId: 2,
+                inputStage: {
+                  stage: 'IXSCAN',
+                  planNodeId: 1,
+                  keyPattern: {
+                    decade: 1,
+                    popularity: -1
+                  },
+                  indexName: 'decade_1_popularity_-1',
+                  isMultiKey: false,
+                  multiKeyPaths: {
+                    decade: [],
+                    popularity: []
+                  },
+                  isUnique: false,
+                  isSparse: false,
+                  isPartial: false,
+                  indexVersion: 2,
+                  direction: 'forward',
+                  indexBounds: {
+                    decade: [
+                      '[MinKey, MaxKey]'
+                    ],
+                    popularity: [
+                      '[MaxKey, MinKey]'
+                    ]
+                  }
+                }
+              }
+            },
+            slotBasedPlan: {
+              slots: '$$RESULT=s16 env: { s5 = {"decade" : 1, "popularity" : -1} }',
+              stages: '[4] project [s16 = newObj("_id", s13, "top_tracks", s15)] \n' +
+                '[4] project [s15 = getElement(s14, 0)] \n' +
+                '[4] group [s13] [s14 = addToArrayCapped(newObj("id", s8, "name", s10, "popularity", s11), 104857600)] spillSlots[s12] mergingExprs[aggConcatArraysCapped(s12, 104857600)] \n' +
+                '[4] project [s13 = (s9 ?: null)] \n' +
+                '[2] nlj inner [] [s1, s2, s3, s4, s5] \n' +
+                '    left \n' +
+                '        [1] ixseek KS(0A0F0104) KS(F0F5FE04) s4 s1 s2 s3 lowPriority [] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" @"decade_1_popularity_-1" true \n' +
+                '    right \n' +
+                '        [2] limit 1ll \n' +
+                '        [2] seek s1 s6 s7 s2 s3 s4 s5 none none [s8 = _id, s9 = decade, s10 = name, s11 = popularity] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false \n'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 13,
+          executionTimeMillis: 1412,
+          totalKeysExamined: 586672,
+          totalDocsExamined: 586672,
+          executionStages: {
+            stage: 'project',
+            planNodeId: 4,
+            nReturned: 13,
+            executionTimeMillisEstimate: 1090,
+            opens: 1,
+            closes: 1,
+            saveState: 49,
+            restoreState: 49,
+            isEOF: 1,
+            projections: {
+              '16': 'newObj("_id", s13, "top_tracks", s15) '
+            },
+            inputStage: {
+              stage: 'project',
+              planNodeId: 4,
+              nReturned: 13,
+              executionTimeMillisEstimate: 1060,
+              opens: 1,
+              closes: 1,
+              saveState: 49,
+              restoreState: 49,
+              isEOF: 1,
+              projections: {
+                '15': 'getElement(s14, 0) '
+              },
+              inputStage: {
+                stage: 'group',
+                planNodeId: 4,
+                nReturned: 13,
+                executionTimeMillisEstimate: 1060,
+                opens: 1,
+                closes: 1,
+                saveState: 49,
+                restoreState: 49,
+                isEOF: 1,
+                groupBySlots: [
+                  13
+                ],
+                expressions: {
+                  '14': 'addToArrayCapped(newObj("id", s8, "name", s10, "popularity", s11), 104857600) ',
+                  initExprs: {
+                    '14': null
+                  }
+                },
+                mergingExprs: {
+                  '12': 'aggConcatArraysCapped(s12, 104857600) '
+                },
+                usedDisk: true,
+                spills: 2,
+                spilledBytes: 42430985,
+                spilledRecords: 14,
+                spilledDataStorageSize: 9859072,
+                inputStage: {
+                  stage: 'project',
+                  planNodeId: 4,
+                  nReturned: 586672,
+                  executionTimeMillisEstimate: 387,
+                  opens: 1,
+                  closes: 1,
+                  saveState: 49,
+                  restoreState: 49,
+                  isEOF: 1,
+                  projections: {
+                    '13': '(s9 ?: null) '
+                  },
+                  inputStage: {
+                    stage: 'nlj',
+                    planNodeId: 2,
+                    nReturned: 586672,
+                    executionTimeMillisEstimate: 386,
+                    opens: 1,
+                    closes: 1,
+                    saveState: 49,
+                    restoreState: 49,
+                    isEOF: 1,
+                    totalDocsExamined: 586672,
+                    totalKeysExamined: 586672,
+                    collectionScans: 0,
+                    collectionSeeks: 586672,
+                    indexScans: 0,
+                    indexSeeks: 1,
+                    indexesUsed: [
+                      'decade_1_popularity_-1'
+                    ],
+                    innerOpens: 586672,
+                    innerCloses: 1,
+                    outerProjects: [],
+                    outerCorrelated: [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
+                    ],
+                    outerStage: {
+                      stage: 'ixseek',
+                      planNodeId: 1,
+                      nReturned: 586672,
+                      executionTimeMillisEstimate: 21,
+                      opens: 1,
+                      closes: 1,
+                      saveState: 49,
+                      restoreState: 49,
+                      isEOF: 1,
+                      indexName: 'decade_1_popularity_-1',
+                      keysExamined: 586672,
+                      seeks: 1,
+                      numReads: 586673,
+                      indexKeySlot: 4,
+                      recordIdSlot: 1,
+                      snapshotIdSlot: 2,
+                      indexIdentSlot: 3,
+                      outputSlots: [],
+                      indexKeysToInclude: '00000000000000000000000000000000',
+                      seekKeyLow: 'KS(0A0F0104) ',
+                      seekKeyHigh: 'KS(F0F5FE04) '
+                    },
+                    innerStage: {
+                      stage: 'limit',
+                      planNodeId: 2,
+                      nReturned: 586672,
+                      executionTimeMillisEstimate: 283,
+                      opens: 586672,
+                      closes: 1,
+                      saveState: 49,
+                      restoreState: 49,
+                      isEOF: 1,
+                      limit: 1,
+                      inputStage: {
+                        stage: 'seek',
+                        planNodeId: 2,
+                        nReturned: 586672,
+                        executionTimeMillisEstimate: 283,
+                        opens: 586672,
+                        closes: 1,
+                        saveState: 49,
+                        restoreState: 49,
+                        isEOF: 0,
+                        numReads: 586672,
+                        recordSlot: 6,
+                        recordIdSlot: 7,
+                        seekRecordIdSlot: 1,
+                        snapshotIdSlot: 2,
+                        indexIdentSlot: 3,
+                        indexKeySlot: 4,
+                        indexKeyPatternSlot: 5,
+                        scanFieldNames: [
+                          '_id',
+                          'decade',
+                          'name',
+                          'popularity'
+                        ],
+                        scanFieldSlots: [
+                          8,
+                          9,
+                          10,
+                          11
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      nReturned: 13,
+      executionTimeMillisEstimate: 1314
+    },
+    {
+      '$project': {
+        _id: true,
+        decade: '$_id',
+        top_tracks: {
+          '$slice': [
+            '$top_tracks',
+            {
+              '$const': 5
+            }
+          ]
+        }
+      },
+      nReturned: 13,
+      executionTimeMillisEstimate: 1410
+    }
+  ],
+  queryShapeHash: 'C4888DF7AB5637F3B9DE200590C6E3180F30BCDC1E9A24648EB8CCD2CECFE87F',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$sort': {
+          decade: 1,
+          popularity: -1
+        }
+      },
+      {
+        '$group': {
+          _id: '$decade',
+          top_tracks: {
+            '$push': {
+              id: '$_id',
+              name: '$name',
+              popularity: '$popularity'
+            }
+          }
+        }
+      },
+      {
+        '$project': {
+          decade: '$_id',
+          top_tracks: {
+            '$slice': [
+              '$top_tracks',
+              5
+            ]
+          }
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
+
+Q4
+
+{
+  explainVersion: '2',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '34134D21',
+          planCacheShapeHash: '34134D21',
+          planCacheKey: 'D70F9095',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            queryPlan: {
+              stage: 'GROUP',
+              planNodeId: 3,
+              inputStage: {
+                stage: 'COLLSCAN',
+                planNodeId: 1,
+                filter: {},
+                direction: 'forward'
+              }
+            },
+            slotBasedPlan: {
+              slots: '$$RESULT=s9 env: {  }',
+              stages: '[3] project [s9 = newObj("_id", s7, "mood_count", s8)] \n' +
+                '[3] project [s7 = newObj("decade", s1, "mood_cluster", s2), s8 = (convert ( s6, int32) ?: s6)] \n' +
+                '[3] group [s1, s2] [s6 = count()] spillSlots[s5] mergingExprs[sum(s5)] \n' +
+                '[1] scan s3 s4 none none none none none none lowPriority [s1 = decade, s2 = mood_cluster] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false '
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 49,
+          executionTimeMillis: 292,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            stage: 'project',
+            planNodeId: 3,
+            nReturned: 49,
+            executionTimeMillisEstimate: 244,
+            opens: 1,
+            closes: 1,
+            saveState: 15,
+            restoreState: 15,
+            isEOF: 1,
+            projections: {
+              '9': 'newObj("_id", s7, "mood_count", s8) '
+            },
+            inputStage: {
+              stage: 'project',
+              planNodeId: 3,
+              nReturned: 49,
+              executionTimeMillisEstimate: 244,
+              opens: 1,
+              closes: 1,
+              saveState: 15,
+              restoreState: 15,
+              isEOF: 1,
+              projections: {
+                '7': 'newObj("decade", s1, "mood_cluster", s2) ',
+                '8': '(convert ( s6, int32) ?: s6) '
+              },
+              inputStage: {
+                stage: 'group',
+                planNodeId: 3,
+                nReturned: 49,
+                executionTimeMillisEstimate: 244,
+                opens: 1,
+                closes: 1,
+                saveState: 15,
+                restoreState: 15,
+                isEOF: 1,
+                groupBySlots: [
+                  1,
+                  2
+                ],
+                expressions: {
+                  '6': 'count() ',
+                  initExprs: {
+                    '6': null
+                  }
+                },
+                mergingExprs: {
+                  '5': 'sum(s5) '
+                },
+                usedDisk: false,
+                spills: 0,
+                spilledBytes: 0,
+                spilledRecords: 0,
+                spilledDataStorageSize: 0,
+                inputStage: {
+                  stage: 'scan',
+                  planNodeId: 1,
+                  nReturned: 586672,
+                  executionTimeMillisEstimate: 173,
+                  opens: 1,
+                  closes: 1,
+                  saveState: 15,
+                  restoreState: 15,
+                  isEOF: 1,
+                  numReads: 586672,
+                  recordSlot: 3,
+                  recordIdSlot: 4,
+                  scanFieldNames: [
+                    'decade',
+                    'mood_cluster'
+                  ],
+                  scanFieldSlots: [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      nReturned: 49,
+      executionTimeMillisEstimate: 292
+    },
+    {
+      '$sort': {
+        sortKey: {
+          '_id.decade': 1,
+          '_id.mood_cluster': 1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 27930,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 49,
+      executionTimeMillisEstimate: 292
+    }
+  ],
+  queryShapeHash: '00F538E12EE90E3BED814EEF5F7BAF46DEF4A757C1A532E7B6CC14AA886C8DF8',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$group': {
+          _id: {
+            decade: '$decade',
+            mood_cluster: '$mood_cluster'
+          },
+          mood_count: {
+            '$sum': 1
+          }
+        }
+      },
+      {
+        '$sort': {
+          '_id.decade': 1,
+          '_id.mood_cluster': 1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
+
+Q5
+
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '82008855',
+          planCacheShapeHash: '82008855',
+          planCacheKey: '3C87B731',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            transformBy: {
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 586672,
+          executionTimeMillis: 484,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            nReturned: 586672,
+            executionTimeMillisEstimate: 33,
+            works: 586673,
+            advanced: 586672,
+            needTime: 0,
+            needYield: 0,
+            saveState: 54,
+            restoreState: 54,
+            isEOF: 1,
+            transformBy: {
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 586672,
+              executionTimeMillisEstimate: 2,
+              works: 586673,
+              advanced: 586672,
+              needTime: 0,
+              needYield: 0,
+              saveState: 54,
+              restoreState: 54,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 586672
+            }
+          }
+        }
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 292
+    },
+    {
+      '$unwind': {
+        path: '$id_artists'
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 339
+    },
+    {
+      '$group': {
+        _id: '$id_artists',
+        collab_count: {
+          '$sum': {
+            '$const': 1
+          }
+        }
+      },
+      maxAccumulatorMemoryUsageBytes: {
+        collab_count: 15648432
+      },
+      totalOutputDataSizeBytes: 36341660,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      numBytesSpilledEstimate: 0,
+      spilledRecords: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 412
+    },
+    {
+      '$sort': {
+        sortKey: {
+          collab_count: -1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 37262156,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 418
+    }
+  ],
+  queryShapeHash: '2AA79E8936550C3E08123BD003052B761420A5A4956316A09801B7D7FD546EC6',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$unwind': '$id_artists'
+      },
+      {
+        '$group': {
+          _id: '$id_artists',
+          collab_count: {
+            '$sum': 1
+          }
+        }
+      },
+      {
+        '$sort': {
+          collab_count: -1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
