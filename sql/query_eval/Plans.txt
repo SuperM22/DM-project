@@ -113,7 +113,7 @@ SELECT artist_id, COUNT(DISTINCT track_id) AS collab_count
 FROM track_artists
 GROUP BY artist_id
 ORDER BY collab_count DESC
-LIMIT 20;
+
 
 MONGODB:
 

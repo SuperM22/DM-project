@@ -1,0 +1,13 @@
+QUERY PLAN                                                                                                                                                                        |
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+Finalize GroupAggregate  (cost=1000.45..10249.20 rows=36 width=17) (actual time=67.285..67.840 rows=37 loops=1)                                                                   |
+  Group Key: decade, tempo_class                                                                                                                                                  |
+  ->  Gather Merge  (cost=1000.45..10248.30 rows=72 width=17) (actual time=67.017..67.797 rows=73 loops=1)                                                                        |
+        Workers Planned: 2                                                                                                                                                        |
+        Workers Launched: 2                                                                                                                                                       |
+        ->  Partial GroupAggregate  (cost=0.42..9239.96 rows=36 width=17) (actual time=6.194..40.934 rows=24 loops=3)                                                             |
+              Group Key: decade, tempo_class                                                                                                                                      |
+              ->  Parallel Index Only Scan using idx_tracks_decade_tempo_class on tracks  (cost=0.42..7406.25 rows=244447 width=9) (actual time=0.675..18.351 rows=195557 loops=3)|
+                    Heap Fetches: 0                                                                                                                                               |
+Planning Time: 3.603 ms                                                                                                                                                           |
+Execution Time: 68.001 ms                                                                                                                                                         |

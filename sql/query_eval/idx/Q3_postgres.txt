@@ -1,0 +1,8 @@
+QUERY PLAN                                                                                                                                                           |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+Subquery Scan on ranked  (cost=0.42..60456.20 rows=586672 width=53) (actual time=1.116..1003.567 rows=61 loops=1)                                                    |
+  ->  WindowAgg  (cost=0.42..54589.48 rows=586672 width=138) (actual time=1.115..1003.560 rows=61 loops=1)                                                           |
+        Run Condition: (row_number() OVER (?) <= 5)                                                                                                                  |
+        ->  Index Scan using idx_tracks_decade_popularity_desc on tracks  (cost=0.42..44322.72 rows=586672 width=53) (actual time=0.923..967.858 rows=586672 loops=1)|
+Planning Time: 1.386 ms                                                                                                                                              |
+Execution Time: 1003.659 ms                                                                                                                                          |

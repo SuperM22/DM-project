@@ -1,0 +1,159 @@
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: '82008855',
+          planCacheShapeHash: '82008855',
+          planCacheKey: '3C87B731',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            transformBy: {
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 586672,
+          executionTimeMillis: 484,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_SIMPLE',
+            nReturned: 586672,
+            executionTimeMillisEstimate: 33,
+            works: 586673,
+            advanced: 586672,
+            needTime: 0,
+            needYield: 0,
+            saveState: 54,
+            restoreState: 54,
+            isEOF: 1,
+            transformBy: {
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 586672,
+              executionTimeMillisEstimate: 2,
+              works: 586673,
+              advanced: 586672,
+              needTime: 0,
+              needYield: 0,
+              saveState: 54,
+              restoreState: 54,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 586672
+            }
+          }
+        }
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 292
+    },
+    {
+      '$unwind': {
+        path: '$id_artists'
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 339
+    },
+    {
+      '$group': {
+        _id: '$id_artists',
+        collab_count: {
+          '$sum': {
+            '$const': 1
+          }
+        }
+      },
+      maxAccumulatorMemoryUsageBytes: {
+        collab_count: 15648432
+      },
+      totalOutputDataSizeBytes: 36341660,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      numBytesSpilledEstimate: 0,
+      spilledRecords: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 412
+    },
+    {
+      '$sort': {
+        sortKey: {
+          collab_count: -1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 37262156,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 418
+    }
+  ],
+  queryShapeHash: '2AA79E8936550C3E08123BD003052B761420A5A4956316A09801B7D7FD546EC6',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$unwind': '$id_artists'
+      },
+      {
+        '$group': {
+          _id: '$id_artists',
+          collab_count: {
+            '$sum': 1
+          }
+        }
+      },
+      {
+        '$sort': {
+          collab_count: -1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}

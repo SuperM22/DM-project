@@ -1,0 +1,10 @@
+QUERY PLAN                                                                                                                                                         |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+Sort  (cost=49951.36..50013.84 rows=24993 width=31) (actual time=319.022..322.935 rows=98504 loops=1)                                                              |
+  Sort Key: (count(DISTINCT track_id)) DESC                                                                                                                        |
+  Sort Method: external merge  Disk: 4056kB                                                                                                                        |
+  ->  GroupAggregate  (cost=0.42..48125.71 rows=24993 width=31) (actual time=0.859..303.891 rows=98504 loops=1)                                                    |
+        Group Key: artist_id                                                                                                                                       |
+        ->  Index Scan using idx_track_artists_artist on track_artists  (cost=0.42..44089.93 rows=757170 width=46) (actual time=0.822..162.321 rows=757170 loops=1)|
+Planning Time: 0.171 ms                                                                                                                                            |
+Execution Time: 325.852 ms                                                                                                                                         |

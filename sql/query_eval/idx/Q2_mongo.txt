@@ -1,0 +1,168 @@
+{
+  explainVersion: '1',
+  stages: [
+    {
+      '$cursor': {
+        queryPlanner: {
+          namespace: 'spotify.tracks',
+          parsedQuery: {},
+          indexFilterSet: false,
+          queryHash: 'F2C2010F',
+          planCacheShapeHash: 'F2C2010F',
+          planCacheKey: 'B66C8223',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          prunedSimilarIndexes: false,
+          winningPlan: {
+            isCached: false,
+            stage: 'PROJECTION_DEFAULT',
+            transformBy: {
+              'audio_features.energy': 1,
+              'audio_features.valence': 1,
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        executionStats: {
+          executionSuccess: true,
+          nReturned: 586672,
+          executionTimeMillis: 643,
+          totalKeysExamined: 0,
+          totalDocsExamined: 586672,
+          executionStages: {
+            isCached: false,
+            stage: 'PROJECTION_DEFAULT',
+            nReturned: 586672,
+            executionTimeMillisEstimate: 89,
+            works: 586673,
+            advanced: 586672,
+            needTime: 0,
+            needYield: 0,
+            saveState: 56,
+            restoreState: 56,
+            isEOF: 1,
+            transformBy: {
+              'audio_features.energy': 1,
+              'audio_features.valence': 1,
+              id_artists: 1,
+              _id: 0
+            },
+            inputStage: {
+              stage: 'COLLSCAN',
+              nReturned: 586672,
+              executionTimeMillisEstimate: 2,
+              works: 586673,
+              advanced: 586672,
+              needTime: 0,
+              needYield: 0,
+              saveState: 56,
+              restoreState: 56,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 586672
+            }
+          }
+        }
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 480
+    },
+    {
+      '$unwind': {
+        path: '$id_artists'
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 480
+    },
+    {
+      '$group': {
+        _id: '$id_artists',
+        avg_valence: {
+          '$avg': '$audio_features.valence'
+        },
+        avg_energy: {
+          '$avg': '$audio_features.energy'
+        }
+      },
+      maxAccumulatorMemoryUsageBytes: {
+        avg_valence: 11966448,
+        avg_energy: 11966448
+      },
+      totalOutputDataSizeBytes: 40023644,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      numBytesSpilledEstimate: 0,
+      spilledRecords: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 612
+    },
+    {
+      '$sort': {
+        sortKey: {
+          avg_valence: -1
+        }
+      },
+      totalDataSizeSortedBytesEstimate: 40944140,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
+      nReturned: 115062,
+      executionTimeMillisEstimate: 612
+    }
+  ],
+  queryShapeHash: '074971A10A240C0B514D33A0D76676592A5C4569BF1DA8A76C0A8492E8F78B43',
+  serverInfo: {
+    host: 'Host-006.homenet.telecomitalia.it',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  command: {
+    aggregate: 'tracks',
+    pipeline: [
+      {
+        '$unwind': '$id_artists'
+      },
+      {
+        '$group': {
+          _id: '$id_artists',
+          avg_valence: {
+            '$avg': '$audio_features.valence'
+          },
+          avg_energy: {
+            '$avg': '$audio_features.energy'
+          }
+        }
+      },
+      {
+        '$sort': {
+          avg_valence: -1
+        }
+      }
+    ],
+    cursor: {},
+    '$db': 'spotify'
+  },
+  ok: 1
+}
