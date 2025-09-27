@@ -7,9 +7,9 @@
           namespace: 'spotify.tracks',
           parsedQuery: {},
           indexFilterSet: false,
-          queryHash: 'F2C2010F',
-          planCacheShapeHash: 'F2C2010F',
-          planCacheKey: 'B66C8223',
+          queryHash: 'AB137F8A',
+          planCacheShapeHash: 'AB137F8A',
+          planCacheKey: '0A6AAB62',
           optimizationTimeMillis: 0,
           maxIndexedOrSolutionsReached: false,
           maxIndexedAndSolutionsReached: false,
@@ -19,14 +19,46 @@
             isCached: false,
             stage: 'PROJECTION_DEFAULT',
             transformBy: {
-              'audio_features.energy': 1,
-              'audio_features.valence': 1,
-              id_artists: 1,
-              _id: 0
+              _id: true,
+              id_artists: true,
+              popularity: {
+                '$convert': {
+                  input: '$popularity',
+                  to: {
+                    '$const': 'double'
+                  },
+                  onError: {
+                    '$const': null
+                  },
+                  onNull: {
+                    '$const': null
+                  }
+                }
+              }
             },
             inputStage: {
-              stage: 'COLLSCAN',
-              direction: 'forward'
+              stage: 'FETCH',
+              inputStage: {
+                stage: 'IXSCAN',
+                keyPattern: {
+                  id_artists: 1
+                },
+                indexName: 'id_artists_1',
+                isMultiKey: false,
+                multiKeyPaths: {
+                  id_artists: []
+                },
+                isUnique: false,
+                isSparse: false,
+                isPartial: false,
+                indexVersion: 2,
+                direction: 'forward',
+                indexBounds: {
+                  id_artists: [
+                    '[MinKey, MaxKey]'
+                  ]
+                }
+              }
             }
           },
           rejectedPlans: []
@@ -34,94 +66,157 @@
         executionStats: {
           executionSuccess: true,
           nReturned: 586672,
-          executionTimeMillis: 643,
-          totalKeysExamined: 0,
+          executionTimeMillis: 1187,
+          totalKeysExamined: 586672,
           totalDocsExamined: 586672,
           executionStages: {
             isCached: false,
             stage: 'PROJECTION_DEFAULT',
             nReturned: 586672,
-            executionTimeMillisEstimate: 89,
+            executionTimeMillisEstimate: 233,
             works: 586673,
             advanced: 586672,
             needTime: 0,
             needYield: 0,
-            saveState: 56,
-            restoreState: 56,
+            saveState: 105,
+            restoreState: 105,
             isEOF: 1,
             transformBy: {
-              'audio_features.energy': 1,
-              'audio_features.valence': 1,
-              id_artists: 1,
-              _id: 0
+              _id: true,
+              id_artists: true,
+              popularity: {
+                '$convert': {
+                  input: '$popularity',
+                  to: {
+                    '$const': 'double'
+                  },
+                  onError: {
+                    '$const': null
+                  },
+                  onNull: {
+                    '$const': null
+                  }
+                }
+              }
             },
             inputStage: {
-              stage: 'COLLSCAN',
+              stage: 'FETCH',
               nReturned: 586672,
-              executionTimeMillisEstimate: 2,
+              executionTimeMillisEstimate: 125,
               works: 586673,
               advanced: 586672,
               needTime: 0,
               needYield: 0,
-              saveState: 56,
-              restoreState: 56,
+              saveState: 105,
+              restoreState: 105,
               isEOF: 1,
-              direction: 'forward',
-              docsExamined: 586672
+              docsExamined: 586672,
+              alreadyHasObj: 0,
+              inputStage: {
+                stage: 'IXSCAN',
+                nReturned: 586672,
+                executionTimeMillisEstimate: 20,
+                works: 586673,
+                advanced: 586672,
+                needTime: 0,
+                needYield: 0,
+                saveState: 105,
+                restoreState: 105,
+                isEOF: 1,
+                keyPattern: {
+                  id_artists: 1
+                },
+                indexName: 'id_artists_1',
+                isMultiKey: false,
+                multiKeyPaths: {
+                  id_artists: []
+                },
+                isUnique: false,
+                isSparse: false,
+                isPartial: false,
+                indexVersion: 2,
+                direction: 'forward',
+                indexBounds: {
+                  id_artists: [
+                    '[MinKey, MaxKey]'
+                  ]
+                },
+                keysExamined: 586672,
+                seeks: 1,
+                dupsTested: 0,
+                dupsDropped: 0
+              }
             }
           }
         }
       },
       nReturned: 586672,
-      executionTimeMillisEstimate: 480
+      executionTimeMillisEstimate: 891
+    },
+    {
+      '$match': {
+        popularity: {
+          '$not': {
+            '$eq': null
+          }
+        }
+      },
+      nReturned: 586672,
+      executionTimeMillisEstimate: 982
     },
     {
       '$unwind': {
         path: '$id_artists'
       },
       nReturned: 586672,
-      executionTimeMillisEstimate: 480
+      executionTimeMillisEstimate: 999
     },
     {
       '$group': {
         _id: '$id_artists',
-        avg_valence: {
-          '$avg': '$audio_features.valence'
+        avg_popularity: {
+          '$avg': '$popularity'
         },
-        avg_energy: {
-          '$avg': '$audio_features.energy'
+        max_popularity: {
+          '$max': '$popularity'
+        },
+        tracks: {
+          '$sum': {
+            '$const': 1
+          }
         }
       },
       maxAccumulatorMemoryUsageBytes: {
-        avg_valence: 11966448,
-        avg_energy: 11966448
+        avg_popularity: 11966448,
+        max_popularity: 8284464,
+        tracks: 15648432
       },
-      totalOutputDataSizeBytes: 40023644,
+      totalOutputDataSizeBytes: 43705628,
       usedDisk: false,
       spills: 0,
       spilledDataStorageSize: 0,
       numBytesSpilledEstimate: 0,
       spilledRecords: 0,
       nReturned: 115062,
-      executionTimeMillisEstimate: 612
+      executionTimeMillisEstimate: 1118
     },
     {
       '$sort': {
         sortKey: {
-          avg_valence: -1
+          avg_popularity: -1
         }
       },
-      totalDataSizeSortedBytesEstimate: 40944140,
+      totalDataSizeSortedBytesEstimate: 44626124,
       usedDisk: false,
       spills: 0,
       spilledDataStorageSize: 0,
       nReturned: 115062,
-      executionTimeMillisEstimate: 612
+      executionTimeMillisEstimate: 1118
     }
   ],
-  queryShapeHash: '074971A10A240C0B514D33A0D76676592A5C4569BF1DA8A76C0A8492E8F78B43',
+  queryShapeHash: 'BE2AC4A9E844175B34B5C5B8EAA42A3C23E6E96D72A9C2E07A14F9397F8D32AD',
   serverInfo: {
-    host: 'Host-006.homenet.telecomitalia.it',
+    host: 'Mac.fritz.box',
     port: 27017,
     version: '8.0.12',
     gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
@@ -142,25 +237,50 @@
     aggregate: 'tracks',
     pipeline: [
       {
+        '$project': {
+          id_artists: 1,
+          popularity: {
+            '$convert': {
+              input: '$popularity',
+              to: 'double',
+              onError: null,
+              onNull: null
+            }
+          }
+        }
+      },
+      {
+        '$match': {
+          popularity: {
+            '$ne': null
+          }
+        }
+      },
+      {
         '$unwind': '$id_artists'
       },
       {
         '$group': {
           _id: '$id_artists',
-          avg_valence: {
-            '$avg': '$audio_features.valence'
+          avg_popularity: {
+            '$avg': '$popularity'
           },
-          avg_energy: {
-            '$avg': '$audio_features.energy'
+          max_popularity: {
+            '$max': '$popularity'
+          },
+          tracks: {
+            '$sum': 1
           }
         }
       },
       {
         '$sort': {
-          avg_valence: -1
+          avg_popularity: -1
         }
       }
     ],
+    allowDiskUse: true,
+    hint: 'id_artists_1',
     cursor: {},
     '$db': 'spotify'
   },

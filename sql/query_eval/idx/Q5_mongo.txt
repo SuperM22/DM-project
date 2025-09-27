@@ -7,9 +7,9 @@
           namespace: 'spotify.tracks',
           parsedQuery: {},
           indexFilterSet: false,
-          queryHash: '82008855',
-          planCacheShapeHash: '82008855',
-          planCacheKey: '3C87B731',
+          queryHash: '84690A9B',
+          planCacheShapeHash: '84690A9B',
+          planCacheKey: '551D9F47',
           optimizationTimeMillis: 0,
           maxIndexedOrSolutionsReached: false,
           maxIndexedAndSolutionsReached: false,
@@ -19,12 +19,32 @@
             isCached: false,
             stage: 'PROJECTION_SIMPLE',
             transformBy: {
-              id_artists: 1,
-              _id: 0
+              _id: true,
+              id_artists: true
             },
             inputStage: {
-              stage: 'COLLSCAN',
-              direction: 'forward'
+              stage: 'FETCH',
+              inputStage: {
+                stage: 'IXSCAN',
+                keyPattern: {
+                  id_artists: 1
+                },
+                indexName: 'id_artists_1',
+                isMultiKey: false,
+                multiKeyPaths: {
+                  id_artists: []
+                },
+                isUnique: false,
+                isSparse: false,
+                isPartial: false,
+                indexVersion: 2,
+                direction: 'forward',
+                indexBounds: {
+                  id_artists: [
+                    '[MinKey, MaxKey]'
+                  ]
+                }
+              }
             }
           },
           rejectedPlans: []
@@ -32,51 +52,85 @@
         executionStats: {
           executionSuccess: true,
           nReturned: 586672,
-          executionTimeMillis: 484,
-          totalKeysExamined: 0,
+          executionTimeMillis: 841,
+          totalKeysExamined: 586672,
           totalDocsExamined: 586672,
           executionStages: {
             isCached: false,
             stage: 'PROJECTION_SIMPLE',
             nReturned: 586672,
-            executionTimeMillisEstimate: 33,
+            executionTimeMillisEstimate: 198,
             works: 586673,
             advanced: 586672,
             needTime: 0,
             needYield: 0,
-            saveState: 54,
-            restoreState: 54,
+            saveState: 70,
+            restoreState: 70,
             isEOF: 1,
             transformBy: {
-              id_artists: 1,
-              _id: 0
+              _id: true,
+              id_artists: true
             },
             inputStage: {
-              stage: 'COLLSCAN',
+              stage: 'FETCH',
               nReturned: 586672,
-              executionTimeMillisEstimate: 2,
+              executionTimeMillisEstimate: 167,
               works: 586673,
               advanced: 586672,
               needTime: 0,
               needYield: 0,
-              saveState: 54,
-              restoreState: 54,
+              saveState: 70,
+              restoreState: 70,
               isEOF: 1,
-              direction: 'forward',
-              docsExamined: 586672
+              docsExamined: 586672,
+              alreadyHasObj: 0,
+              inputStage: {
+                stage: 'IXSCAN',
+                nReturned: 586672,
+                executionTimeMillisEstimate: 60,
+                works: 586673,
+                advanced: 586672,
+                needTime: 0,
+                needYield: 0,
+                saveState: 70,
+                restoreState: 70,
+                isEOF: 1,
+                keyPattern: {
+                  id_artists: 1
+                },
+                indexName: 'id_artists_1',
+                isMultiKey: false,
+                multiKeyPaths: {
+                  id_artists: []
+                },
+                isUnique: false,
+                isSparse: false,
+                isPartial: false,
+                indexVersion: 2,
+                direction: 'forward',
+                indexBounds: {
+                  id_artists: [
+                    '[MinKey, MaxKey]'
+                  ]
+                },
+                keysExamined: 586672,
+                seeks: 1,
+                dupsTested: 0,
+                dupsDropped: 0
+              }
             }
           }
         }
       },
       nReturned: 586672,
-      executionTimeMillisEstimate: 292
+      executionTimeMillisEstimate: 646
     },
     {
       '$unwind': {
         path: '$id_artists'
       },
       nReturned: 586672,
-      executionTimeMillisEstimate: 339
+      executionTimeMillisEstimate: 691
     },
     {
       '$group': {
@@ -97,7 +151,7 @@
       numBytesSpilledEstimate: 0,
       spilledRecords: 0,
       nReturned: 115062,
-      executionTimeMillisEstimate: 412
+      executionTimeMillisEstimate: 802
     },
     {
       '$sort': {
@@ -110,12 +164,12 @@
       spills: 0,
       spilledDataStorageSize: 0,
       nReturned: 115062,
-      executionTimeMillisEstimate: 418
+      executionTimeMillisEstimate: 802
     }
   ],
-  queryShapeHash: '2AA79E8936550C3E08123BD003052B761420A5A4956316A09801B7D7FD546EC6',
+  queryShapeHash: 'FFEB484F7569F5C8E77DAFFDBB3C265D4198D72B3072CBDAB692DBE13B16CB8D',
   serverInfo: {
-    host: 'Host-006.homenet.telecomitalia.it',
+    host: 'Mac.fritz.box',
     port: 27017,
     version: '8.0.12',
     gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
@@ -136,6 +190,11 @@
     aggregate: 'tracks',
     pipeline: [
       {
+        '$project': {
+          id_artists: 1
+        }
+      },
+      {
         '$unwind': '$id_artists'
       },
       {
@@ -152,6 +211,8 @@
         }
       }
     ],
+    allowDiskUse: true,
+    hint: 'id_artists_1',
     cursor: {},
     '$db': 'spotify'
   },

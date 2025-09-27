@@ -1,10 +1,119 @@
-QUERY PLAN                                                                                                                                                         |
--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-Sort  (cost=49951.36..50013.84 rows=24993 width=31) (actual time=319.022..322.935 rows=98504 loops=1)                                                              |
-  Sort Key: (count(DISTINCT track_id)) DESC                                                                                                                        |
-  Sort Method: external merge  Disk: 4056kB                                                                                                                        |
-  ->  GroupAggregate  (cost=0.42..48125.71 rows=24993 width=31) (actual time=0.859..303.891 rows=98504 loops=1)                                                    |
-        Group Key: artist_id                                                                                                                                       |
-        ->  Index Scan using idx_track_artists_artist on track_artists  (cost=0.42..44089.93 rows=757170 width=46) (actual time=0.822..162.321 rows=757170 loops=1)|
-Planning Time: 0.171 ms                                                                                                                                            |
-Execution Time: 325.852 ms                                                                                                                                         |
+[
+  {
+    "Plan": {
+      "Node Type": "Sort",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 49951.36,
+      "Total Cost": 50013.84,
+      "Plan Rows": 24993,
+      "Plan Width": 31,
+      "Actual Startup Time": 323.369,
+      "Actual Total Time": 327.422,
+      "Actual Rows": 98504,
+      "Actual Loops": 1,
+      "Output": ["artist_id", "(count(DISTINCT track_id))"],
+      "Sort Key": ["(count(DISTINCT track_artists.track_id)) DESC"],
+      "Sort Method": "external merge",
+      "Sort Space Used": 4056,
+      "Sort Space Type": "Disk",
+      "Shared Hit Blocks": 459341,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 507,
+      "Temp Written Blocks": 509,
+      "WAL Records": 0,
+      "WAL FPI": 0,
+      "WAL Bytes": 0,
+      "Plans": [
+        {
+          "Node Type": "Aggregate",
+          "Strategy": "Sorted",
+          "Partial Mode": "Simple",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 0.42,
+          "Total Cost": 48125.71,
+          "Plan Rows": 24993,
+          "Plan Width": 31,
+          "Actual Startup Time": 0.047,
+          "Actual Total Time": 308.853,
+          "Actual Rows": 98504,
+          "Actual Loops": 1,
+          "Output": ["artist_id", "count(DISTINCT track_id)"],
+          "Group Key": ["track_artists.artist_id"],
+          "Shared Hit Blocks": 459341,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0,
+          "WAL Records": 0,
+          "WAL FPI": 0,
+          "WAL Bytes": 0,
+          "Plans": [
+            {
+              "Node Type": "Index Scan",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Scan Direction": "Forward",
+              "Index Name": "idx_track_artists_artist",
+              "Relation Name": "track_artists",
+              "Schema": "public",
+              "Alias": "track_artists",
+              "Startup Cost": 0.42,
+              "Total Cost": 44089.93,
+              "Plan Rows": 757170,
+              "Plan Width": 46,
+              "Actual Startup Time": 0.026,
+              "Actual Total Time": 158.471,
+              "Actual Rows": 757170,
+              "Actual Loops": 1,
+              "Output": ["track_id", "artist_id"],
+              "Shared Hit Blocks": 459341,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "WAL Records": 0,
+              "WAL FPI": 0,
+              "WAL Bytes": 0
+            }
+          ]
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 0,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 0.118,
+    "Triggers": [
+    ],
+    "Execution Time": 330.633
+  }
+]

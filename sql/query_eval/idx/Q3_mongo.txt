@@ -1,4 +1,3 @@
-
 {
   explainVersion: '2',
   stages: [
@@ -11,7 +10,7 @@
           queryHash: '33B06002',
           planCacheShapeHash: '33B06002',
           planCacheKey: '1089408A',
-          optimizationTimeMillis: 3,
+          optimizationTimeMillis: 0,
           maxIndexedOrSolutionsReached: false,
           maxIndexedAndSolutionsReached: false,
           maxScansToExplodeReached: false,
@@ -54,11 +53,11 @@
               }
             },
             slotBasedPlan: {
-              slots: '$$RESULT=s16 env: { s5 = {"decade" : 1, "popularity" : -1} }',
-              stages: '[4] project [s16 = newObj("_id", s13, "top_tracks", s15)] \n' +
-                '[4] project [s15 = getElement(s14, 0)] \n' +
-                '[4] group [s13] [s14 = addToArrayCapped(newObj("id", s8, "name", s10, "popularity", s11), 104857600)] spillSlots[s12] mergingExprs[aggConcatArraysCapped(s12, 104857600)] \n' +
-                '[4] project [s13 = (s9 ?: null)] \n' +
+              slots: '$$RESULT=s17 env: { s5 = {"decade" : 1, "popularity" : -1}, s12 = SortSpec({"popularity" : -1}) }',
+              stages: '[4] project [s17 = newObj("_id", s14, "top5", s16)] \n' +
+                '[4] project [s16 = aggTopNFinalize(s15, s12)] \n' +
+                '[4] group [s14] [s15 = aggTopN(s12, null, getSortKeyDesc(s11), (newObj("id", s8, "name", s10, "popularity", s11) ?: null)) init{[[], 0ll, 5ll, 0, 104857600, true]}] spillSlots[s13] mergingExprs[aggTopNMerge(s13, s12)] \n' +
+                '[4] project [s14 = (s9 ?: null)] \n' +
                 '[2] nlj inner [] [s1, s2, s3, s4, s5] \n' +
                 '    left \n' +
                 '        [1] ixseek KS(0A0F0104) KS(F0F5FE04) s4 s1 s2 s3 lowPriority [] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" @"decade_1_popularity_-1" true \n' +
@@ -72,84 +71,84 @@
         executionStats: {
           executionSuccess: true,
           nReturned: 13,
-          executionTimeMillis: 1412,
+          executionTimeMillis: 617,
           totalKeysExamined: 586672,
           totalDocsExamined: 586672,
           executionStages: {
             stage: 'project',
             planNodeId: 4,
             nReturned: 13,
-            executionTimeMillisEstimate: 1090,
+            executionTimeMillisEstimate: 598,
             opens: 1,
             closes: 1,
-            saveState: 49,
-            restoreState: 49,
+            saveState: 20,
+            restoreState: 20,
             isEOF: 1,
             projections: {
-              '16': 'newObj("_id", s13, "top_tracks", s15) '
+              '17': 'newObj("_id", s14, "top5", s16) '
             },
             inputStage: {
               stage: 'project',
               planNodeId: 4,
               nReturned: 13,
-              executionTimeMillisEstimate: 1060,
+              executionTimeMillisEstimate: 598,
               opens: 1,
               closes: 1,
-              saveState: 49,
-              restoreState: 49,
+              saveState: 20,
+              restoreState: 20,
               isEOF: 1,
               projections: {
-                '15': 'getElement(s14, 0) '
+                '16': 'aggTopNFinalize(s15, s12) '
               },
               inputStage: {
                 stage: 'group',
                 planNodeId: 4,
                 nReturned: 13,
-                executionTimeMillisEstimate: 1060,
+                executionTimeMillisEstimate: 598,
                 opens: 1,
                 closes: 1,
-                saveState: 49,
-                restoreState: 49,
+                saveState: 20,
+                restoreState: 20,
                 isEOF: 1,
                 groupBySlots: [
-                  13
+                  14
                 ],
                 expressions: {
-                  '14': 'addToArrayCapped(newObj("id", s8, "name", s10, "popularity", s11), 104857600) ',
+                  '15': 'aggTopN(s12, null, getSortKeyDesc(s11), (newObj("id", s8, "name", s10, "popularity", s11) ?: null)) ',
                   initExprs: {
-                    '14': null
+                    '15': '[[], 0ll, 5ll, 0, 104857600, true] '
                   }
                 },
                 mergingExprs: {
-                  '12': 'aggConcatArraysCapped(s12, 104857600) '
+                  '13': 'aggTopNMerge(s13, s12) '
                 },
-                usedDisk: true,
-                spills: 2,
-                spilledBytes: 42430985,
-                spilledRecords: 14,
-                spilledDataStorageSize: 9859072,
+                usedDisk: false,
+                spills: 0,
+                spilledBytes: 0,
+                spilledRecords: 0,
+                spilledDataStorageSize: 0,
                 inputStage: {
                   stage: 'project',
                   planNodeId: 4,
                   nReturned: 586672,
-                  executionTimeMillisEstimate: 387,
+                  executionTimeMillisEstimate: 450,
                   opens: 1,
                   closes: 1,
-                  saveState: 49,
-                  restoreState: 49,
+                  saveState: 20,
+                  restoreState: 20,
                   isEOF: 1,
                   projections: {
-                    '13': '(s9 ?: null) '
+                    '14': '(s9 ?: null) '
                   },
                   inputStage: {
                     stage: 'nlj',
                     planNodeId: 2,
                     nReturned: 586672,
-                    executionTimeMillisEstimate: 386,
+                    executionTimeMillisEstimate: 450,
                     opens: 1,
                     closes: 1,
-                    saveState: 49,
-                    restoreState: 49,
+                    saveState: 20,
+                    restoreState: 20,
                     isEOF: 1,
                     totalDocsExamined: 586672,
                     totalKeysExamined: 586672,
@@ -174,11 +173,11 @@
                       stage: 'ixseek',
                       planNodeId: 1,
                       nReturned: 586672,
-                      executionTimeMillisEstimate: 21,
+                      executionTimeMillisEstimate: 80,
                       opens: 1,
                       closes: 1,
-                      saveState: 49,
-                      restoreState: 49,
+                      saveState: 20,
+                      restoreState: 20,
                       isEOF: 1,
                       indexName: 'decade_1_popularity_-1',
                       keysExamined: 586672,
@@ -197,22 +196,22 @@
                       stage: 'limit',
                       planNodeId: 2,
                       nReturned: 586672,
-                      executionTimeMillisEstimate: 283,
+                      executionTimeMillisEstimate: 370,
                       opens: 586672,
                       closes: 1,
-                      saveState: 49,
-                      restoreState: 49,
+                      saveState: 20,
+                      restoreState: 20,
                       isEOF: 1,
                       limit: 1,
                       inputStage: {
                         stage: 'seek',
                         planNodeId: 2,
                         nReturned: 586672,
-                        executionTimeMillisEstimate: 283,
+                        executionTimeMillisEstimate: 370,
                         opens: 586672,
                         closes: 1,
-                        saveState: 49,
-                        restoreState: 49,
+                        saveState: 20,
+                        restoreState: 20,
                         isEOF: 0,
                         numReads: 586672,
                         recordSlot: 6,
@@ -244,28 +243,25 @@
         }
       },
       nReturned: 13,
-      executionTimeMillisEstimate: 1314
+      executionTimeMillisEstimate: 600
     },
     {
-      '$project': {
-        _id: true,
-        decade: '$_id',
-        top_tracks: {
-          '$slice': [
-            '$top_tracks',
-            {
-              '$const': 5
-            }
-          ]
+      '$sort': {
+        sortKey: {
+          _id: 1
         }
       },
+      totalDataSizeSortedBytesEstimate: 29658,
+      usedDisk: false,
+      spills: 0,
+      spilledDataStorageSize: 0,
       nReturned: 13,
-      executionTimeMillisEstimate: 1410
+      executionTimeMillisEstimate: 600
     }
   ],
-  queryShapeHash: 'C4888DF7AB5637F3B9DE200590C6E3180F30BCDC1E9A24648EB8CCD2CECFE87F',
+  queryShapeHash: '63E4644A1583D630A885D5EA0428A87FE397D407D6D5C96F25659C8D848FE17E',
   serverInfo: {
-    host: 'Host-006.homenet.telecomitalia.it',
+    host: 'Mac.fritz.box',
     port: 27017,
     version: '8.0.12',
     gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
@@ -294,27 +290,29 @@
       {
         '$group': {
           _id: '$decade',
-          top_tracks: {
-            '$push': {
-              id: '$_id',
-              name: '$name',
-              popularity: '$popularity'
+          top5: {
+            '$topN': {
+              n: 5,
+              sortBy: {
+                popularity: -1
+              },
+              output: {
+                id: '$_id',
+                name: '$name',
+                popularity: '$popularity'
+              }
             }
           }
         }
       },
       {
-        '$project': {
-          decade: '$_id',
-          top_tracks: {
-            '$slice': [
-              '$top_tracks',
-              5
-            ]
-          }
+        '$sort': {
+          _id: 1
         }
       }
     ],
+    allowDiskUse: true,
+    hint: 'decade_1_popularity_-1',
     cursor: {},
     '$db': 'spotify'
   },

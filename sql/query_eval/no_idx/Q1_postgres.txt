@@ -1,20 +1,235 @@
-|QUERY PLAN                                                                                                                                     |
-|-----------------------------------------------------------------------------------------------------------------------------------------------|
-|Finalize GroupAggregate  (cost=13675.13..13684.43 rows=36 width=17) (actual time=229.836..231.510 rows=37 loops=1)                             |
-|  Group Key: decade, tempo_class                                                                                                               |
-|  ->  Gather Merge  (cost=13675.13..13683.53 rows=72 width=17) (actual time=229.824..231.470 rows=109 loops=1)                                 |
-|        Workers Planned: 2                                                                                                                     |
-|        Workers Launched: 2                                                                                                                    |
-|        ->  Sort  (cost=12675.11..12675.20 rows=36 width=17) (actual time=224.392..224.394 rows=36 loops=3)                                    |
-|              Sort Key: decade, tempo_class                                                                                                    |
-|              Sort Method: quicksort  Memory: 27kB                                                                                             |
-|              Worker 0:  Sort Method: quicksort  Memory: 27kB                                                                                  |
-|              Worker 1:  Sort Method: quicksort  Memory: 27kB                                                                                  |
-|              ->  Partial HashAggregate  (cost=12673.82..12674.18 rows=36 width=17) (actual time=224.335..224.342 rows=36 loops=3)             |
-|                    Group Key: decade, tempo_class                                                                                             |
-|                    Batches: 1  Memory Usage: 24kB                                                                                             |
-|                    Worker 0:  Batches: 1  Memory Usage: 24kB                                                                                  |
-|                    Worker 1:  Batches: 1  Memory Usage: 24kB                                                                                  |
-|                    ->  Parallel Seq Scan on tracks  (cost=0.00..10840.47 rows=244447 width=9) (actual time=0.398..140.622 rows=195557 loops=3)|
-|Planning Time: 0.587 ms                                                                                                                        |
-|Execution Time: 231.708 ms                                                                                                                     |
+[
+  {
+    "Plan": {
+      "Node Type": "Aggregate",
+      "Strategy": "Sorted",
+      "Partial Mode": "Finalize",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 1000.45,
+      "Total Cost": 10249.20,
+      "Plan Rows": 36,
+      "Plan Width": 17,
+      "Actual Startup Time": 61.862,
+      "Actual Total Time": 62.751,
+      "Actual Rows": 37,
+      "Actual Loops": 1,
+      "Output": ["decade", "tempo_class", "count(*)"],
+      "Group Key": ["tracks.decade", "tracks.tempo_class"],
+      "Shared Hit Blocks": 2,
+      "Shared Read Blocks": 505,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "WAL Records": 0,
+      "WAL FPI": 0,
+      "WAL Bytes": 0,
+      "Plans": [
+        {
+          "Node Type": "Gather Merge",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 1000.45,
+          "Total Cost": 10248.30,
+          "Plan Rows": 72,
+          "Plan Width": 17,
+          "Actual Startup Time": 61.786,
+          "Actual Total Time": 62.733,
+          "Actual Rows": 75,
+          "Actual Loops": 1,
+          "Output": ["decade", "tempo_class", "(PARTIAL count(*))"],
+          "Workers Planned": 2,
+          "Workers Launched": 2,
+          "Shared Hit Blocks": 2,
+          "Shared Read Blocks": 505,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0,
+          "WAL Records": 0,
+          "WAL FPI": 0,
+          "WAL Bytes": 0,
+          "Plans": [
+            {
+              "Node Type": "Aggregate",
+              "Strategy": "Sorted",
+              "Partial Mode": "Partial",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.42,
+              "Total Cost": 9239.96,
+              "Plan Rows": 36,
+              "Plan Width": 17,
+              "Actual Startup Time": 6.116,
+              "Actual Total Time": 39.247,
+              "Actual Rows": 25,
+              "Actual Loops": 3,
+              "Output": ["decade", "tempo_class", "PARTIAL count(*)"],
+              "Group Key": ["tracks.decade", "tracks.tempo_class"],
+              "Shared Hit Blocks": 2,
+              "Shared Read Blocks": 505,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "WAL Records": 0,
+              "WAL FPI": 0,
+              "WAL Bytes": 0,
+              "Workers": [
+                {
+                  "Worker Number": 0,
+                  "Actual Startup Time": 3.326,
+                  "Actual Total Time": 53.037,
+                  "Actual Rows": 37,
+                  "Actual Loops": 1,
+                  "Shared Hit Blocks": 1,
+                  "Shared Read Blocks": 241,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "WAL Records": 0,
+                  "WAL FPI": 0,
+                  "WAL Bytes": 0
+                },
+                {
+                  "Worker Number": 1,
+                  "Actual Startup Time": 3.368,
+                  "Actual Total Time": 52.978,
+                  "Actual Rows": 36,
+                  "Actual Loops": 1,
+                  "Shared Hit Blocks": 1,
+                  "Shared Read Blocks": 241,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "WAL Records": 0,
+                  "WAL FPI": 0,
+                  "WAL Bytes": 0
+                }
+              ],
+              "Plans": [
+                {
+                  "Node Type": "Index Only Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": true,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "idx_tracks_decade_tempo_class",
+                  "Relation Name": "tracks",
+                  "Schema": "public",
+                  "Alias": "tracks",
+                  "Startup Cost": 0.42,
+                  "Total Cost": 7406.25,
+                  "Plan Rows": 244447,
+                  "Plan Width": 9,
+                  "Actual Startup Time": 0.779,
+                  "Actual Total Time": 15.690,
+                  "Actual Rows": 195557,
+                  "Actual Loops": 3,
+                  "Output": ["decade", "tempo_class"],
+                  "Heap Fetches": 0,
+                  "Shared Hit Blocks": 2,
+                  "Shared Read Blocks": 505,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "WAL Records": 0,
+                  "WAL FPI": 0,
+                  "WAL Bytes": 0,
+                  "Workers": [
+                    {
+                      "Worker Number": 0,
+                      "Actual Startup Time": 0.156,
+                      "Actual Total Time": 20.341,
+                      "Actual Rows": 281639,
+                      "Actual Loops": 1,
+                      "Shared Hit Blocks": 1,
+                      "Shared Read Blocks": 241,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "WAL Records": 0,
+                      "WAL FPI": 0,
+                      "WAL Bytes": 0
+                    },
+                    {
+                      "Worker Number": 1,
+                      "Actual Startup Time": 0.232,
+                      "Actual Total Time": 20.438,
+                      "Actual Rows": 281380,
+                      "Actual Loops": 1,
+                      "Shared Hit Blocks": 1,
+                      "Shared Read Blocks": 241,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0,
+                      "WAL Records": 0,
+                      "WAL FPI": 0,
+                      "WAL Bytes": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 131,
+      "Shared Read Blocks": 2,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 1.202,
+    "Triggers": [
+    ],
+    "Execution Time": 62.822
+  }
+]

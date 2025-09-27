@@ -7,10 +7,10 @@
           namespace: 'spotify.tracks',
           parsedQuery: {},
           indexFilterSet: false,
-          queryHash: 'FA44DA7E',
-          planCacheShapeHash: 'FA44DA7E',
-          planCacheKey: 'B3A1CCBE',
-          optimizationTimeMillis: 2,
+          queryHash: '018EA3BB',
+          planCacheShapeHash: '018EA3BB',
+          planCacheKey: '345D74E7',
+          optimizationTimeMillis: 0,
           maxIndexedOrSolutionsReached: false,
           maxIndexedAndSolutionsReached: false,
           maxScansToExplodeReached: false,
@@ -21,18 +21,48 @@
               stage: 'GROUP',
               planNodeId: 3,
               inputStage: {
-                stage: 'COLLSCAN',
-                planNodeId: 1,
-                filter: {},
-                direction: 'forward'
+                stage: 'PROJECTION_COVERED',
+                planNodeId: 2,
+                transformBy: {
+                  decade: true,
+                  tempo_class: true,
+                  _id: false
+                },
+                inputStage: {
+                  stage: 'IXSCAN',
+                  planNodeId: 1,
+                  keyPattern: {
+                    decade: 1,
+                    tempo_class: 1
+                  },
+                  indexName: 'decade_1_tempo_class_1',
+                  isMultiKey: false,
+                  multiKeyPaths: {
+                    decade: [],
+                    tempo_class: []
+                  },
+                  isUnique: false,
+                  isSparse: false,
+                  isPartial: false,
+                  indexVersion: 2,
+                  direction: 'forward',
+                  indexBounds: {
+                    decade: [
+                      '[MinKey, MaxKey]'
+                    ],
+                    tempo_class: [
+                      '[MinKey, MaxKey]'
+                    ]
+                  }
+                }
               }
             },
             slotBasedPlan: {
-              slots: '$$RESULT=s9 env: {  }',
-              stages: '[3] project [s9 = newObj("_id", s7, "track_count", s8)] \n' +
-                '[3] project [s7 = newObj("decade", s1, "tempo_class", s2), s8 = (convert ( s6, int32) ?: s6)] \n' +
-                '[3] group [s1, s2] [s6 = count()] spillSlots[s5] mergingExprs[sum(s5)] \n' +
-                '[1] scan s3 s4 none none none none none none lowPriority [s1 = decade, s2 = tempo_class] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" true false '
+              slots: '$$RESULT=s8 env: {  }',
+              stages: '[3] project [s8 = newObj("_id", s6, "track_count", s7)] \n' +
+                '[3] project [s6 = newObj("decade", s1, "tempo_class", s2), s7 = (convert ( s5, int32) ?: s5)] \n' +
+                '[3] group [s1, s2] [s5 = count()] spillSlots[s4] mergingExprs[sum(s4)] \n' +
+                '[1] ixseek KS(0A0A0104) KS(F0F0FE04) none s3 none none lowPriority [s1 = 0, s2 = 1] @"eb2ae5e4-34bd-4d97-81c5-5bea59129794" @"decade_1_tempo_class_1" true '
             }
           },
           rejectedPlans: []
@@ -40,58 +70,58 @@
         executionStats: {
           executionSuccess: true,
           nReturned: 37,
-          executionTimeMillis: 317,
-          totalKeysExamined: 0,
-          totalDocsExamined: 586672,
+          executionTimeMillis: 151,
+          totalKeysExamined: 586672,
+          totalDocsExamined: 0,
           executionStages: {
             stage: 'project',
             planNodeId: 3,
             nReturned: 37,
-            executionTimeMillisEstimate: 307,
+            executionTimeMillisEstimate: 146,
             opens: 1,
             closes: 1,
-            saveState: 11,
-            restoreState: 11,
+            saveState: 8,
+            restoreState: 8,
             isEOF: 1,
             projections: {
-              '9': 'newObj("_id", s7, "track_count", s8) '
+              '8': 'newObj("_id", s6, "track_count", s7) '
             },
             inputStage: {
               stage: 'project',
               planNodeId: 3,
               nReturned: 37,
-              executionTimeMillisEstimate: 307,
+              executionTimeMillisEstimate: 146,
               opens: 1,
               closes: 1,
-              saveState: 11,
-              restoreState: 11,
+              saveState: 8,
+              restoreState: 8,
               isEOF: 1,
               projections: {
-                '7': 'newObj("decade", s1, "tempo_class", s2) ',
-                '8': '(convert ( s6, int32) ?: s6) '
+                '6': 'newObj("decade", s1, "tempo_class", s2) ',
+                '7': '(convert ( s5, int32) ?: s5) '
               },
               inputStage: {
                 stage: 'group',
                 planNodeId: 3,
                 nReturned: 37,
-                executionTimeMillisEstimate: 307,
+                executionTimeMillisEstimate: 146,
                 opens: 1,
                 closes: 1,
-                saveState: 11,
-                restoreState: 11,
+                saveState: 8,
+                restoreState: 8,
                 isEOF: 1,
                 groupBySlots: [
                   1,
                   2
                 ],
                 expressions: {
-                  '6': 'count() ',
+                  '5': 'count() ',
                   initExprs: {
-                    '6': null
+                    '5': null
                   }
                 },
                 mergingExprs: {
-                  '5': 'sum(s5) '
+                  '4': 'sum(s4) '
                 },
                 usedDisk: false,
                 spills: 0,
@@ -99,26 +129,27 @@
                 spilledRecords: 0,
                 spilledDataStorageSize: 0,
                 inputStage: {
-                  stage: 'scan',
+                  stage: 'ixseek',
                   planNodeId: 1,
                   nReturned: 586672,
-                  executionTimeMillisEstimate: 282,
+                  executionTimeMillisEstimate: 146,
                   opens: 1,
                   closes: 1,
-                  saveState: 11,
-                  restoreState: 11,
+                  saveState: 8,
+                  restoreState: 8,
                   isEOF: 1,
-                  numReads: 586672,
-                  recordSlot: 3,
-                  recordIdSlot: 4,
-                  scanFieldNames: [
-                    'decade',
-                    'tempo_class'
-                  ],
-                  scanFieldSlots: [
+                  indexName: 'decade_1_tempo_class_1',
+                  keysExamined: 586672,
+                  seeks: 1,
+                  numReads: 586673,
+                  recordIdSlot: 3,
+                  outputSlots: [
                     1,
                     2
-                  ]
+                  ],
+                  indexKeysToInclude: '00000000000000000000000000000011',
+                  seekKeyLow: 'KS(0A0A0104) ',
+                  seekKeyHigh: 'KS(F0F0FE04) '
                 }
               }
             }
@@ -126,7 +157,7 @@
         }
       },
       nReturned: 37,
-      executionTimeMillisEstimate: 313
+      executionTimeMillisEstimate: 151
     },
     {
       '$sort': {
@@ -140,12 +171,12 @@
       spills: 0,
       spilledDataStorageSize: 0,
       nReturned: 37,
-      executionTimeMillisEstimate: 313
+      executionTimeMillisEstimate: 151
     }
   ],
-  queryShapeHash: '1A7469AF7AFC466B98C8B861DADBDB1DC8FBC0BB5AA9073CE9A51F0DFA9783F2',
+  queryShapeHash: 'F5B632196444F64AB920299A848D7F12984F7901C16697DBCE7732DE5C2B1B4D',
   serverInfo: {
-    host: 'Host-006.homenet.telecomitalia.it',
+    host: 'Mac.fritz.box',
     port: 27017,
     version: '8.0.12',
     gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
@@ -166,6 +197,12 @@
     aggregate: 'tracks',
     pipeline: [
       {
+        '$sort': {
+          decade: 1,
+          tempo_class: 1
+        }
+      },
+      {
         '$group': {
           _id: {
             decade: '$decade',
@@ -183,6 +220,8 @@
         }
       }
     ],
+    allowDiskUse: true,
+    hint: 'decade_1_tempo_class_1',
     cursor: {},
     '$db': 'spotify'
   },

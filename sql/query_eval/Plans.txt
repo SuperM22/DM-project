@@ -1,8 +1,13 @@
+Before explain  using to avoid offset
+SET track_io_timing = on;
+SET jit = off;
+
+
 Q1
 
 SQL:
 
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
 SELECT decade, tempo_class, COUNT(*) AS track_count
 FROM tracks
 GROUP BY decade, tempo_class
@@ -25,7 +30,7 @@ Q2
 
 SQL:
 
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
 SELECT
   a.id AS artist_id,
   a.name,
@@ -54,7 +59,7 @@ Q3
 
 SQL:
 
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
 SELECT id, name, popularity, decade
 FROM (
   SELECT *,
@@ -86,7 +91,7 @@ Q4
 
 SQL:
 
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
 SELECT decade, mood_cluster, COUNT(*) AS mood_count
 FROM tracks
 GROUP BY decade, mood_cluster
@@ -108,7 +113,7 @@ Q5
 
 SQL:
 
-EXPLAIN ANALYZE
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
 SELECT artist_id, COUNT(DISTINCT track_id) AS collab_count
 FROM track_artists
 GROUP BY artist_id
@@ -127,22 +132,178 @@ db.tracks.aggregate([
 ]).explain("executionStats")
 
 
-
-MONGODB INDEX Creation:
-// Q1
-db.tracks.createIndex({ decade: 1, tempo_class: 1 })
-
-// Q2 (optional for optimization, limited gain for aggregation alone)
-db.tracks.createIndex({ id_artists: 1 })
-
-// Q3
-db.tracks.createIndex({ decade: 1, popularity: -1 })
-
-// Q4
-db.tracks.createIndex({ decade: 1, mood_cluster: 1 })
+IDX --------------------------------------------------
 
 
 
+Q1
+
+MONGODB:
+db.tracks.aggregate(
+  [
+    { $sort: { decade: 1, tempo_class: 1 } },
+    { $group: {
+        _id: { decade: "$decade", tempo_class: "$tempo_class" },
+        track_count: { $sum: 1 }
+    }},
+    { $sort: { "_id.decade": 1, "_id.tempo_class": 1 } }
+  ],
+  { hint: "decade_1_tempo_class_1", allowDiskUse: true }
+).explain("executionStats")
+
+SQL (PostgreSQL):
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+SELECT decade, tempo_class, COUNT(*) AS track_count
+FROM tracks
+GROUP BY decade, tempo_class
+ORDER BY decade, tempo_class;
 
 
 
+Q2  -- Artist popularity profile: avg & max popularity per artist
+
+MONGODB:
+db.tracks.aggregate(
+  [
+    { $project: {
+        id_artists: 1,
+        popularity: { $convert: { input: "$popularity", to: "double", onError: null, onNull: null } }
+    }},
+    { $match: { popularity: { $ne: null } }},
+    { $unwind: "$id_artists" },
+    { $group: {
+        _id: "$id_artists",
+        avg_popularity: { $avg: "$popularity" },
+        max_popularity: { $max: "$popularity" },
+        tracks: { $sum: 1 }
+    }},
+    { $sort: { avg_popularity: -1 } }
+  ],
+  { hint: "id_artists_1", allowDiskUse: true }
+).explain("executionStats")
+
+SQL (PostgreSQL):
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+SELECT
+  ta.artist_id,
+  AVG(t.popularity::double precision) AS avg_popularity,
+  MAX(t.popularity::double precision) AS max_popularity,
+  COUNT(*) AS tracks
+FROM track_artists AS ta
+JOIN tracks AS t ON t.id = ta.track_id
+WHERE t.popularity IS NOT NULL
+GROUP BY ta.artist_id
+ORDER BY avg_popularity DESC;
+
+
+
+Q3  -- Top-5 most popular tracks per decade
+
+MONGODB:
+db.tracks.aggregate(
+  [
+    { $sort: { decade: 1, popularity: -1 } },
+    { $group: {
+        _id: "$decade",
+        top5: {
+          $topN: {
+            n: 5,
+            sortBy: { popularity: -1 },
+            output: { id: "$_id", name: "$name", popularity: "$popularity" }
+          }
+        }
+    }},
+    { $sort: { _id: 1 } }
+  ],
+  { hint: "decade_1_popularity_-1", allowDiskUse: true }
+).explain("executionStats")
+
+SQL (PostgreSQL):
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+SELECT id, name, popularity, decade
+FROM (
+  SELECT t.*,
+         ROW_NUMBER() OVER (PARTITION BY t.decade ORDER BY t.popularity DESC) AS rk
+  FROM tracks AS t
+) ranked
+WHERE rk <= 5
+ORDER BY decade, popularity DESC;
+
+
+Q4 — Decade × Popularity Bands (counts + avg energy/valence)
+
+MONGODB:
+db.tracks.aggregate(
+  [
+    { $match: { decade: { $ne: null }, popularity: { $ne: null } } },
+    { $sort: { decade: 1, popularity: -1 } },
+    { $set: {
+        _p10: { $multiply: [ { $floor: { $divide: ["$popularity", 10] } }, 10 ] },
+        energy_d: { $toDouble: "$energy" },
+        valence_d: "$valence"
+    }},
+    { $set: {
+        pop_bucket: {
+          $concat: [
+            { $toString: "$_p10" }, "-",
+            { $toString: { $add: ["$_p10", 9] } }
+          ]
+        }
+    }},
+    { $group: {
+        _id: { decade: "$decade", pop_bucket: "$pop_bucket" },
+        track_count: { $sum: 1 },
+        avg_energy:  { $avg: "$energy_d" },
+        avg_valence: { $avg: "$valence_d" }
+    }},
+    { $sort: { "_id.decade": 1, "_id.pop_bucket": 1 } }
+  ],
+  { hint: "decade_1_popularity_-1", allowDiskUse: true }
+).explain("executionStats")
+
+
+SQL (PostgreSQL):
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+SELECT
+  t.decade,
+  CONCAT(
+    (FLOOR(t.popularity/10.0)::int)*10, '-',
+    (FLOOR(t.popularity/10.0)::int)*10 + 9
+  ) AS pop_bucket,
+  COUNT(*)                           AS track_count,
+  AVG(af.energy)                     AS avg_energy,
+  AVG(af.valence)                    AS avg_valence
+FROM public.tracks AS t
+LEFT JOIN public.audio_features AS af
+  ON af.track_id = t.id
+WHERE t.decade IS NOT NULL
+  AND t.popularity IS NOT NULL
+GROUP BY t.decade, pop_bucket
+ORDER BY t.decade, pop_bucket;
+
+
+
+
+
+Q5  -- Collaboration volume: tracks per artist (descending)
+
+MONGODB:
+db.tracks.aggregate(
+  [
+    { $project: { id_artists: 1 } },
+    { $unwind: "$id_artists" },
+    { $group: {
+        _id: "$id_artists",
+        collab_count: { $sum: 1 }
+    }},
+    { $sort: { collab_count: -1 } }
+  ],
+  { hint: "id_artists_1", allowDiskUse: true }
+).explain("executionStats")
+
+SQL (PostgreSQL):
+EXPLAIN ANALYZE
+SELECT artist_id, COUNT(DISTINCT track_id) AS collab_count
+FROM track_artists
+GROUP BY artist_id
+ORDER BY collab_count DESC;
