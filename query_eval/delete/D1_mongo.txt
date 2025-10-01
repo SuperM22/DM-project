@@ -1,0 +1,60 @@
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'spotify.tracks',
+    parsedQuery: { tempo_class: [Object] },
+    indexFilterSet: false,
+    queryHash: '12B4BDE4',
+    planCacheShapeHash: '12B4BDE4',
+    planCacheKey: 'FB96006C',
+    optimizationTimeMillis: 0,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    prunedSimilarIndexes: false,
+    winningPlan: { isCached: false, stage: 'BATCHED_DELETE', inputStage: [Object] },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 0,
+    executionTimeMillis: 251,
+    totalKeysExamined: 0,
+    totalDocsExamined: 586672,
+    executionStages: {
+      isCached: false,
+      stage: 'BATCHED_DELETE',
+      nReturned: 0,
+      executionTimeMillisEstimate: 208,
+      works: 586673,
+      advanced: 0,
+      needTime: 586672,
+      needYield: 0,
+      saveState: 7,
+      restoreState: 7,
+      isEOF: 1,
+      nWouldDelete: 192531,
+      inputStage: [Object]
+    }
+  },
+  command: { delete: 'tracks', deletes: [ [Object] ], '$db': 'spotify' },
+  serverInfo: {
+    host: 'Mac.fritz.box',
+    port: 27017,
+    version: '8.0.12',
+    gitVersion: 'b60fc6875b5fb4b63cc0dbbd8dda0d6d6277921a'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  ok: 1
+}

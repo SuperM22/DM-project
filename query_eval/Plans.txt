@@ -307,3 +307,54 @@ SELECT artist_id, COUNT(DISTINCT track_id) AS collab_count
 FROM track_artists
 GROUP BY artist_id
 ORDER BY collab_count DESC;
+
+
+
+--------- UPDATE AND DELETE -------------------
+U1
+
+Bulk update on popularity
+
+
+MONGODB
+
+
+db.tracks.explain("executionStats").update(
+  { decade: "1980s" },
+  { $inc: { popularity: 5 } },
+  { multi: true }
+);
+
+Bulk update and new col creation
+SQL
+
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+UPDATE public.tracks
+SET popularity = LEAST(popularity + 5, 100)
+WHERE decade = '1980s';
+
+
+D1 
+bulk delete on tempo_class
+
+
+SQL
+
+EXPLAIN (ANALYZE, BUFFERS, WAL, VERBOSE, SUMMARY, FORMAT JSON)
+DELETE FROM public.tracks
+WHERE tempo_class = 'fast';
+
+MONGODB
+
+db.runCommand({
+  explain: {
+    delete: "tracks",
+    deletes: [
+      { q: { tempo_class: "fast" }, limit: 0 }  // 0 = delete ALL matches
+    ]
+  },
+  verbosity: "executionStats"
+});
+
+
+
