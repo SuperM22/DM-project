@@ -357,4 +357,5 @@ db.runCommand({
 });
 
 
-
+Re running the queries cause precedent method was not actually measuring the time of the actual query (just planning) in mongo 
+using new Date() 
